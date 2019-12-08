@@ -144,8 +144,30 @@ colsC=[
 #如何看df中某一列中是否包含某字符串
 #df.col.str.contains("xxx",regex=False)
 
+#如何看df中不同列的数据类型
+#df.dtypes
+
+def toValue(str):
+    if(str.find("+")>=0):
+        arr=str.split("+")
+        return int(arr[0])+int(arr[1])
+    elif(str.find("-")>=0):
+        arr=str.split("-")
+        return int(arr[0])-int(arr[1])
+    else:
+        return int(str)
+    
+import numpy as np
 df1=pd.read_csv('datasets/players_19.csv',index_col=0)
 df1=df1.loc[:,colsC]
+for col in df1.columns:
+    if(df1[col].dtype==np.object):
+        df1[col]=df1[col].apply(toValue)
+        
 df2=pd.read_csv('datasets/players_18.csv',index_col=0)
 df2=df2.loc[:,colsC]
+for col in df2.columns:
+    if(df2[col].dtype==np.object):
+        df2[col]=df2[col].apply(toValue)
 df3=df1-df2
+df3=df3[np.isnan(df3['overall'])==False]
