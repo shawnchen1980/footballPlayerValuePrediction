@@ -226,7 +226,7 @@ def is_number(s):
     
 import numpy as np
 def prepareData():
-    df1=pd.read_csv('datasets/players_19.csv',index_col=0)
+    df1=pd.read_csv('datasets/players_20.csv',index_col=0)
     df1=df1.dropna(axis=1)
     numCol=[]
     for col in df1.columns:
@@ -287,7 +287,8 @@ def linearReg1(data):
     print('Variance score: %.2f' % r2_score(ytest, y_pred))
     
 def linearReg2(data):
-    data=data.drop(columns=["wage_eur"])
+    data=data.drop(columns=["wage_eur",'international_reputation'])
+    
     train, test = train_test_split(data, test_size=0.20, random_state=0)
 
 #    xtrain = train[['overall']]
@@ -307,8 +308,10 @@ def linearReg2(data):
 #    plt.ylabel("Value")
 #    plt.show()
     print(regr.coef_)
+    for a in zip(xtrain.columns,regr.coef_[0]):
+        print(a)
 
-
+    print(sorted(zip(xtrain.columns,regr.coef_[0]),key=lambda x:x[1],reverse=True))
     # The mean squared error
     print("Mean squared error: %.2f" % mean_squared_error(ytest, y_pred))
     
