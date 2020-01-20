@@ -371,6 +371,11 @@ def linearReg3(data,cluster_label=0):
 #    data=data.drop(columns=["wage_eur",'international_reputation','club','short_name','team_position'])
     df=data[data["cluster"]==cluster_label]
     df=df.drop(columns=["cluster"])
+    
+    for f in df.columns:
+        related = df['value_eur'].corr(df[f])
+        print("%s: %f" % (f,related))
+        
     train, test = train_test_split(df, test_size=0.20, random_state=0)
 
 #    xtrain = train[['overall']]
@@ -393,7 +398,7 @@ def linearReg3(data,cluster_label=0):
 #    for a in zip(xtrain.columns,regr.coef_[0]):
 #        print(a)
     dd=sorted(zip(xtrain.columns,regr.coef_[0]),key=lambda x:x[1],reverse=True)
-    data=data.loc[:,[dd[0][0],dd[1][0],dd[2][0],dd[3][0],dd[4][0],"value_eur"]]
+    data=data.loc[:,[dd[0][0],dd[1][0],dd[2][0],dd[3][0],dd[4][0],dd[-1][0],"value_eur"]]
     print(dd)
     # The mean squared error
     print("Mean squared error: %.2f" % mean_squared_error(ytest, y_pred))
@@ -403,6 +408,8 @@ def linearReg3(data,cluster_label=0):
     return data
 
 def linearReg4(data):
+    if("cluster" in data.columns):
+        data=data.drop(columns=["cluster"])
     train, test = train_test_split(data, test_size=0.20, random_state=0)
 
 #    xtrain = train[['overall']]
@@ -421,7 +428,92 @@ def linearReg4(data):
     # Explained variance score: 1 is perfect prediction
     print('Variance score: %.2f' % r2_score(ytest, y_pred))
     
+
+
+#from sklearn.preprocessing import PolynomialFeatures
+#from sklearn.pipeline import make_pipeline
+def polyReg3(data,cluster_label=0):
+#    data=data.drop(columns=["wage_eur",'international_reputation','club','short_name','team_position'])
+    df=data[data["cluster"]==cluster_label]
+    df=df.drop(columns=["cluster"])
+    train, test = train_test_split(df, test_size=0.20, random_state=0)
+
+#    xtrain = train[['overall']]
+    ytrain = train[['value_eur']]
+#    xtest = test[['overall']]
+    ytest = test[['value_eur']]
+    xtrain=train.drop(columns=["value_eur"])
+    xtest=test.drop(columns=["value_eur"])
     
+    pol = make_pipeline(PolynomialFeatures(1), linear_model.Ridge())
+    pol.fit(xtrain, ytrain)
+    # Make predictions using the testing set
+    y_pred = pol.predict(xtest)
+    # The mean squared error
+    print("Mean squared error: %.2f" % mean_squared_error(ytest, y_pred))
+    
+    # Explained variance score: 1 is perfect prediction
+    print('Variance score: %.2f' % r2_score(ytest, y_pred))
+    return df
+
+def polyReg4(data):
+#    data=data.drop(columns=["wage_eur",'international_reputation','club','short_name','team_position'])
+#    df=data[data["cluster"]==cluster_label]
+#    df=df.drop(columns=["cluster"])
+    if("cluster" in data.columns):
+        data=data.drop(columns=["cluster"])
+    train, test = train_test_split(data, test_size=0.20, random_state=0)
+
+#    xtrain = train[['overall']]
+    ytrain = train[['value_eur']]
+#    xtest = test[['overall']]
+    ytest = test[['value_eur']]
+    xtrain=train.drop(columns=["value_eur"])
+    xtest=test.drop(columns=["value_eur"])
+    
+    pol = make_pipeline(PolynomialFeatures(1), linear_model.Ridge())
+    pol.fit(xtrain, ytrain)
+    # Make predictions using the testing set
+    y_pred = pol.predict(xtest)
+    # The mean squared error
+    print("Mean squared error: %.2f" % mean_squared_error(ytest, y_pred))
+    
+    # Explained variance score: 1 is perfect prediction
+    print('Variance score: %.2f' % r2_score(ytest, y_pred))
+    return df
+
+from sklearn.svm import SVR
+
+def SVR3(data,cluster_label=-1):
+#    data=data.drop(columns=["wage_eur",'international_reputation','club','short_name','team_position'])
+    df=data
+    if(cluster_label>=0):
+        df=data[data["cluster"]==cluster_label]
+    if("cluster" in df.columns):
+        df=df.drop(columns=["cluster"])
+    train, test = train_test_split(df, test_size=0.20, random_state=0)
+
+#    xtrain = train[['overall']]
+    ytrain = train[['value_eur']]
+#    xtest = test[['overall']]
+    ytest = test[['value_eur']]
+    xtrain=train.drop(columns=["value_eur"])
+    xtest=test.drop(columns=["value_eur"])
+    
+    svr_rbf = SVR(kernel='rbf', gamma=1e-3, C=100, epsilon=0.1)
+    svr_rbf.fit(xtrain, ytrain.values.ravel())
+#    pol = make_pipeline(PolynomialFeatures(2), linear_model.Ridge())
+#    pol.fit(xtrain, ytrain)
+    # Make predictions using the testing set
+    y_pred = svr_rbf.predict(xtest)
+    # The mean squared error
+    print("Mean squared error: %.2f" % mean_squared_error(ytest, y_pred))
+    
+    # Explained variance score: 1 is perfect prediction
+    print('Variance score: %.2f' % r2_score(ytest, y_pred))
+    return df
+
+
 def scatterPlot(transformed):
     sns.set(style="white")
     pal =  sns.blend_palette(vapeplot.palette('vaporwave'))
@@ -515,7 +607,7 @@ def polyRidge(df):
     ytest = test[['value_eur']]
 #    xtrain=train.drop(columns=["value_eur"])
 #    xtest=test.drop(columns=["value_eur"])
-    pol = make_pipeline(PolynomialFeatures(6), linear_model.Ridge())
+    pol = make_pipeline(PolynomialFeatures(3), linear_model.Ridge())
     pol.fit(xtrain, ytrain)
     y_pol = pol.predict(xtest)
     plt.scatter(xtest, ytest,  color='black')
@@ -568,9 +660,25 @@ def compareChinaVsBrazil(df):
 #    fig.subplots_adjust(vspace=0.5,y=1.08)
 #    fig.title(u'标题')
 df,df2=prepareDataWithCluster()
-linearReg3(df,cluster_label=0)
-linearReg3(df,cluster_label=1)
-linearReg3(df,cluster_label=2)
+data0=linearReg3(df,cluster_label=0)
+data1=linearReg3(df,cluster_label=1)
+data2=linearReg3(df,cluster_label=2)
+#
+#linearReg4(df)
+print("poly reg start")
+#
+polyReg3(df,cluster_label=0)
+polyReg3(df,cluster_label=1)
+polyReg3(df,cluster_label=2)
+
+polyReg4(df)
+
+
+#SVR3(data0,cluster_label=-1)
+#SVR3(data1,cluster_label=-1)
+#SVR3(data2,cluster_label=-1)
+#
+#SVR3(df,cluster_label=-1)
 #dd=pcaScatterPlot(df)
 
 
