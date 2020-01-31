@@ -101,6 +101,8 @@ colsA=[
  'nationality',
  'club']
 
+
+
 colsC=[
  'club',
  'age',
@@ -445,6 +447,12 @@ df=prepareData()
 
 linearReg1(df)
 
+colsB=[
+ 'nationality',
+ 'club']
+df1=pd.read_csv('datasets/players_20.csv',index_col=0)
+mkdict = lambda row: dict([(col, row[col]) for col in colsB])
+df1=df1[colsB].apply(mkdict, axis=1)
 #df=kmeans(df)
 #df=linearReg3(df,cluster_label=1)
 #linearReg4(df)
