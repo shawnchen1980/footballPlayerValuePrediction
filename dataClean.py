@@ -739,6 +739,13 @@ def deepLearning(df):
     # Explained variance score: 1 is perfect prediction
     print('Variance score: %.2f' % r2_score(y_test, y_pred))  
 
+def plotBarForClusters(df,df2):
+    print('plot for all players')
+    posCountBarplot(df2)
+    for i in range(3):
+        print('printing cluster {}',i)
+        posCountBarplot(df2[df['cluster']==i])
+
 df,df2=prepareDataWithCluster()
 
 #作图比较中场球员与后卫的技术指标
@@ -754,7 +761,10 @@ df,df2=prepareDataWithCluster()
 #compareClusteredVsUnclustered(df)
 
 #不断更改epoch值进行深度学习
-deepLearning(df)
+#deepLearning(df)
+
+#为不同类型的球员画柱状图，看其位置分布
+plotBarForClusters(df,df2)
 
 #[('movement_reactions', 10669910.629105326), ('defending_standing_tackle', 8233411.759554121), ('defending_sliding_tackle', 6384230.850897608), ('mentality_interceptions', 4542779.73979069), ('defending_marking', 4184467.7363923676), ('mentality_vision', 2780563.2569291545), ('movement_sprint_speed', 2482640.1234917007), ('attacking_finishing', 2113008.841974644), ('mentality_composure', 1629612.8627936952), ('weight_kg', 1277576.0351028857), ('power_jumping', 1249848.2550068246), ('attacking_short_passing', 1198090.2160034678), ('mentality_aggression', 1096285.1837503752), ('mentality_positioning', 914432.8799217364), ('skill_curve', 748474.2926481327), ('attacking_heading_accuracy', 722945.6335170204), ('height_cm', 651538.2113331575), ('attacking_volleys', 641160.4266911634), ('skill_long_passing', 464998.1387351558), ('weak_foot', 448929.49055599596), ('goalkeeping_reflexes', 373743.67539316276), ('movement_acceleration', 317273.2748238363), ('skill_moves', 178901.477029702), ('skill_dribbling', 172342.93207938666), ('skill_fk_accuracy', 64721.92788577685), ('movement_balance', -221523.83494034846), ('goalkeeping_diving', -244265.33573962498), ('power_shot_power', -256187.3344564906), ('goalkeeping_kicking', -275932.0002267789), ('power_strength', -456039.4460197133), ('power_stamina', -651478.7889918883), ('skill_ball_control', -1077709.9220470565), ('mentality_penalties', -1374244.9787419515), ('power_long_shots', -1487943.7426576086), ('movement_agility', -1640604.8456918402), ('goalkeeping_positioning', -1668536.0140711204), ('goalkeeping_handling', -2294265.0389139345), ('attacking_crossing', -2315619.190697673), ('age', -6925056.75244279)]
 #Mean squared error: 10355848813632.86
